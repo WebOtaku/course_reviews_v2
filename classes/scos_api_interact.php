@@ -1,10 +1,12 @@
 <?php
 namespace block_course_reviews_v2;
 
+/*require_once(__DIR__.'/../../../config.php');
+require_once($CFG->dirroot.'/blocks/scos/locallib.php');*/
+
 class scos_api_interact {
     /**
-     * Запрашивает из API СЦОС отзывы по текущему курсу.
-     * Если не передавать id курса, то вернёт все отзывы.
+     * Запрашивает с помощью API СЦОС отзывы по текущему курсу.
      * Структура возвращаемого результата:
      *     array(
      *         [index] => object {
@@ -14,10 +16,9 @@ class scos_api_interact {
      *             [rated_at]  => <date YY-MM-DD>
      *         }
      *     ).
-     * @param int $courseid - id курса
+     * @param int $fbid - id модуля "Обратная связь" (feedback) в таблице feedback.
      * @return array массив объектов, согласно структуре возвращаемого результата.
      * */
-    //public static function get_course_feedback($courseid) {
     public static function get_course_feedback($fbid) {
         $fbusers = db_request::get_user_reviews_users_by_courseid($fbid, false);
         $raw_fbvalues = db_request::get_user_reviews_values_by_courseid($fbid, false);
@@ -36,5 +37,24 @@ class scos_api_interact {
 
         return $course_feedback;
     }
+
+    /**
+     * Запрашивает с помощью API СЦОС отзывы по текущему курсу.
+     * Структура возвращаемого результата:
+     *     array(
+     *         [index] => object {
+     *             [rating]    => <integer>,
+     *             [text]      => <string>,
+     *             [is_expert] => <integer>
+     *             [rated_at]  => <date YY-MM-DD>
+     *         }
+     *     ).
+     * @param int $courseid - id курса
+     * @return array массив объектов, согласно структуре возвращаемого результата.
+     * */
+    /*public static function get_course_feedback($courseid) {
+        $course_feedback = block_scos_get_feedback($courseid);
+        return $course_feedback;
+    }*/
 }
 ?>

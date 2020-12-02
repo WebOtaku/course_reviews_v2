@@ -18,14 +18,12 @@ class view_template {
         $PAGE->navbar->add($page_title, $page_url);
         echo $OUTPUT->header();
 
-        if (!$is_scos) {
-            $url = new moodle_url($page_url, array('is_scos' => !$is_scos, 'idnumber' => $idnumber));
+        $url = new moodle_url($page_url, array('is_scos' => !$is_scos, 'idnumber' => $idnumber));
+
+        if (!$is_scos)
             $html_link = html_writer::link($url, get_string('scos_course_reviews_v2', 'block_course_reviews_v2'));
-        }
-        else {
-            $url = new moodle_url($page_url, array('is_scos' => !$is_scos, 'idnumber' => $idnumber));
+        else
             $html_link = html_writer::link($url, get_string('course_reviews_v2', 'block_course_reviews_v2'));
-        }
 
         echo $OUTPUT->heading($page_title . ' ('. $html_link .')');
     }

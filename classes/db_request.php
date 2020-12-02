@@ -17,8 +17,8 @@ class db_request {
 
         $sql_request = '
             SELECT fb.id AS fbid
-            FROM mdl_course_modules AS cm
-            JOIN mdl_feedback AS fb ON fb.id = cm.instance
+            FROM {course_modules} AS cm
+            JOIN {feedback} AS fb ON fb.id = cm.instance
             WHERE cm.deletioninprogress = 0 AND cm.course = :courseid AND cm.idnumber = :idnumber AND cm.module = :moduleid
         ';
 
@@ -38,7 +38,7 @@ class db_request {
      * id модуля "Обратная связь" (feedback), то вернёт всех пользователей, которые оставляли отзывы.
      * Структура возвращаемого результата:
      *     array(
-     *         [fbcid] => array {
+     *         [fbcid] => object {
      *             [fbcid]        => <integer>, - fbc.id (feedback_completed (fbc))
      *             [fbid]         => <integer>, - fb.id (feedback (fb))
      *             [userid]       => <integer>, - u.id (user (u))
@@ -109,7 +109,7 @@ class db_request {
      * id модуля "Обратная связь" (feedback), то вернёт значения по всем отзывам.
      * Структура возвращаемого результата:
      *     array(
-     *         [fbvid] => array {
+     *         [fbvid] => object {
      *             [fbvid]    => <integer>, - fbv.id
      *             [fbcid]    => <integer>, - fbc.id (feedback_completed (fbc))
      *             [fbid]     => <integer>, - fb.id (feedback (fb))
@@ -159,7 +159,7 @@ class db_request {
      * Если не передавать id отзывов, то вернёт значения по всем отзывам, что есть.
      * Структура возвращаемого результата:
      *     array(
-     *         [fbvid] => array {
+     *         [fbvid] => object {
      *             [fbvid]    => <integer>, - fbv.id
      *             [fbcid]    => <integer>, - fbc.id (feedback_completed (fbc))
      *             [fbid]     => <integer>, - fb.id (feedback (fb))
@@ -268,7 +268,7 @@ class db_request {
     /**
      * Определяет и вовзращает наибольший id в таблице feedback_completed
      * для пользователя с id = 1 (СЦОС).
-     * @param $fbid int - id модуля "Обратная связь" (feedback) в таблице feedback.
+     * @param int $fbid - id модуля "Обратная связь" (feedback) в таблице feedback.
      * @return int наибольший id в таблице feedback_completed.
      * */
     public static function get_max_scos_course_review_timemodified($fbid) {
@@ -315,7 +315,7 @@ class db_request {
 
     /**
      * Запрашивает элементы из таблицы feedback_item связанные с указанным feedback (fbid)
-     * @param $fbid int - id модуля "Обратная связь" (feedback) в таблице feedback.
+     * @param int $fbid - id модуля "Обратная связь" (feedback) в таблице feedback.
      * @return array массив вида:
      * array(
      *     [id] => object {

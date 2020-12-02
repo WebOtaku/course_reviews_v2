@@ -58,20 +58,39 @@ if (has_capability('block/course_reviews_v2:addinstance', $context)) {
         if ($fb = db_request::get_feedback_by_idnumber($courseid, $idnumber)) {
             if(utility::check_fb_validity($fb)) {
 
-                // TODO: переместить вставку отзывов с CЦОС в указанное место
+                // Обработка нажатия кнопки "Сохранить" (Save)
+                if (count($_POST)) {
+                    $params = array(
+                        'context' => $context,
+                        'other' => array(
+                            'formdata' => $_POST
+                        )
+                    );
+
+                    $event = review_updated::create($params);
+                    $event->trigger();
+
+                    redirect(new moodle_url($page_url, array('idnumber' => $idnumber)));
+                }
+
                 $raw_scos_course_reviews = scos_api_interact::get_course_feedback($fb->fbid);
                 db_request::insert_scos_course_reviews($raw_scos_course_reviews, $fb->fbid);
 
                 if ($is_scos) {
-                    // TODO: место для вставки отзывов с СЦОС
                     $fbvalues = db_request::get_user_reviews_values_by_courseid($fb->fbid, true);
                 } else $fbvalues = db_request::get_user_reviews_values_by_courseid($fb->fbid, false);
 
+                /*if ($is_scos) {
+                    $raw_scos_course_reviews = scos_api_interact::get_course_feedback($fb->fbid);
+                    db_request::insert_scos_course_reviews($raw_scos_course_reviews, $fb->fbid);
+
+                    $fbvalues = db_request::get_user_reviews_values_by_courseid($fb->fbid, true);
+                } else $fbvalues = db_request::get_user_reviews_values_by_courseid($fb->fbid, false);*/
 
                 // Проверка на наличие выводимых значений
                 if (count($fbvalues)) {
                     /*print_object(db_request::get_scos_course_reviews(
-                        $fb->fbid, true,
+                        $fb->fbid, false,
                         array('offset' => 0, 'limit' => 8),
                         array('field' => 'timemodified', 'order' => 'DESC')));*/
                     
@@ -98,19 +117,6 @@ if (has_capability('block/course_reviews_v2:addinstance', $context)) {
                         // Отображать только в случае если не было запроса на скачивание таблицы
                         view_template::print_page_header($page_title, $page_url, $is_scos, $idnumber);
                         echo html_form_view::get_html_form_feedback_table_params($page_url, $courseid, $idnumber);
-                    }
-
-                    // Обработка нажатия кнопки "Сохранить" (Save)
-                    if (count($_POST)) {
-                        $params = array(
-                            'context' => $context,
-                            'other' => array(
-                                'formdata' => $_POST
-                            )
-                        );
-
-                        $event = review_updated::create($params);
-                        $event->trigger();
                     }
 
                     if ($is_scos) {
