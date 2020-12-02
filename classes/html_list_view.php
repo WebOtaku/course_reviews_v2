@@ -8,12 +8,12 @@ use moodle_url;
 class html_list_view
 {
     /**
-     * Формирует и возвращает маркированны html список (ul) с требуемыми сылками
-     * @param string[] $links - массив ссылок
-     * @param array[] $linksparams - массив массивов параметров для ссылок $links
-     * @param string $langfile - название языкового файла
-     * @param string[] $keyslangfile - ключи в языковом файле (названия ссылок)
-     * @return string html строка
+     * Формирует и возвращает маркированны html список (ul) с требуемыми сылками.
+     * @param string[] $links - массив ссылок.
+     * @param array[] $linksparams - массив массивов параметров для ссылок $links.
+     * @param string $langfile - название языкового файла.
+     * @param string[] $keyslangfile - ключи в языковом файле (названия ссылок).
+     * @return string html строка.
      * */
     public static function get_html_list_links($links = [], $linksparams = [], $langfile = '', $keyslangfile = []) {
         $html_str = '<ul>';

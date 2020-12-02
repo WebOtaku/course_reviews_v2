@@ -1,6 +1,6 @@
 <?php
 
-use block_course_reviews_v2\utilities;
+use block_course_reviews_v2\utility;
 
 class reviews_table extends table_sql
 {
@@ -21,7 +21,7 @@ class reviews_table extends table_sql
     public function __construct($uniqueid, $raw_fbvalues = [], $courseid = 0, $idnumber = 0, $optional_columns = [], $optional_headers = [])
     {
         parent::__construct($uniqueid);
-        $this->fbvalues = utilities::prepare_fbvalues($raw_fbvalues);
+        $this->fbvalues = utility::prepare_fbvalues($raw_fbvalues);
 
         $this->headers[] = get_string('fbcid', 'block_course_reviews_v2');
 

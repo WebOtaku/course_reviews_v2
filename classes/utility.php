@@ -2,10 +2,10 @@
 
 namespace block_course_reviews_v2;
 
-class utilities {
+class utility {
     /**
-     * Представляет содержимое отзывов в удобном для вывовода виде
-     * @param $raw_fbvalues array - ассоциативный массив объектов хранящих содержимое отзывов (ответы).
+     * Представляет содержимое отзывов в удобном для вывовода виде.
+     * @param array $raw_fbvalues - ассоциативный массив объектов хранящих содержимое отзывов (ответы).
      * @return array массив вида:
      * array (
      *     [fbcid] => array(
@@ -23,8 +23,8 @@ class utilities {
     }
 
     /**
-     * Возвращает типы полей в отзыве
-     * @param $raw_fbvalues array - ассоциативный массив объектов хранящих содержимое отзывов (ответы).
+     * Возвращает типы полей в отзыве.
+     * @param array $raw_fbvalues - ассоциативный массив объектов хранящих содержимое отзывов (ответы).
      * @return array массив вида:
      * array(
      *     [fbiname] => <string>, - fbi.typ
@@ -41,10 +41,10 @@ class utilities {
 
     /**
      * Фильтрует отзывы пришедший с СЦОС по времени, оставляя только те,
-     * что были рамещены позже указанной временной метки
-     * @param $raw_scos_course_reviews array - ассоциативный массив объектов хранящих содержимое отзывов c СЦОС.
-     * @param $unix_time array - время в формате UNIX метки.
-     * @return array отфильтрованный по времени $raw_scos_course_reviews
+     * что были рамещены позже указанной временной метки.
+     * @param array $raw_scos_course_reviews - ассоциативный массив объектов хранящих содержимое отзывов c СЦОС.
+     * @param array $unix_time - время в формате UNIX метки.
+     * @return array отфильтрованный по времени $raw_scos_course_reviews.
      * */
     public static function filter_raw_scos_course_reviews_by_rated_at($raw_scos_course_reviews, $unix_time) {
         $filtered_raw_scos_course_reviews = array();
@@ -63,10 +63,10 @@ class utilities {
 
     /**
      * Проверяет чтобы каждому типу данных из массива $valid_field_types соотвествовало поле
-     * из массива $fbitems
-     * @param $fbitems array - ассоциативный массив элементов (полей) используемых в отзыве.
-     * @param $valid_field_types array - валидные типы данных для полей используемых в отзыве.
-     * @return bool указанные поля имеют требуемые типы - да/нет
+     * из массива $fbitems.
+     * @param array $fbitems - ассоциативный массив элементов (полей) используемых в отзыве.
+     * @param array $valid_field_types - валидные типы данных для полей используемых в отзыве.
+     * @return bool указанные поля имеют требуемые типы - да/нет.
      * */
     public static function check_fbitems_has_valid_types($fbitems, $valid_field_types) {
         $is_valid = false;
@@ -88,33 +88,26 @@ class utilities {
         return $is_valid;
     }
 
+    /**
+     * Проверяет поля указанного экземпляра модуля feedback на сответствие требованиям:
+     * - кол-во полей == constant::$NUM_REVIEW_FIELDS
+     * - поля имеют требуемый тип (constant::$VALID_FIELDS_TYPES)
+     * @param object $fb  - ассоциативный массив элементов (полей) используемых в отзыве.
+     * @return bool указанные поля имеют требуемые типы - да/нет.
+     * */
     public static function check_fb_validity($fb) {
         $fbitems = db_request::get_review_items($fb->fbid);
 
-        return count($fbitems) == constants::$NUM_REVIEW_FIELDS ||
-            utilities::check_fbitems_has_valid_types($fbitems, constants::$VALID_FIELDS_TYPES);
+        return count($fbitems) == constant::$NUM_REVIEW_FIELDS ||
+            utility::check_fbitems_has_valid_types($fbitems, constant::$VALID_FIELDS_TYPES);
     }
 
-    public static function print_page_header($page_title, $page_url) {
-        global $PAGE, $OUTPUT;
-        $PAGE->set_title($page_title);
-        $PAGE->set_heading($page_title);
-        $PAGE->navbar->add($page_title, $page_url);
-        echo $OUTPUT->header();
-        echo $OUTPUT->heading($page_title);
-    }
-
-    public static function print_page_footer() {
-        global $OUTPUT;
-        echo $OUTPUT->footer();
-    }
-
-    public static function print_message($page_title, $page_url, $message = '') {
-        self::print_page_header($page_title, $page_url);
-        echo '<h2>'.$message.'</h2>';
-        self::print_page_footer();
-    }
-
+    /**
+     * Проверяет строку на то является ли она целым числом или нет.
+     * @param string $str  - строка, которая проверяется на целое число.
+     * @param array $range  - массив содержащий диапазон, в который должно попадать целое число.
+     * @return bool $str является целым числом - да/нет.
+     * */
     public static function str_is_int($str, $range = array(0, 0)) {
         $int_num = intval($str);
 

@@ -4,7 +4,7 @@ namespace block_course_reviews_v2\event;
 class review_updated extends \core\event\base {
 
     /**
-     * Init method.
+     * Init метод.
      *
      * @return void
      */

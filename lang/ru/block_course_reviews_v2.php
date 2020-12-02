@@ -4,7 +4,7 @@ $string['pluginname'] = 'Отзывы на курс (вер. 2)';
 $string['course_reviews_v2:addinstance'] = 'Добавить новый блок Отзывы на курс (вер. 2)';
 
 $string['course_reviews_v2'] = 'Отзывы на курс (вер. 2)';
-$string['scos_course_reviews'] = 'Отзывы на курс c СЦОС (вер. 2)';
+$string['scos_course_reviews_v2'] = 'Отзывы на курс c СЦОС (вер. 2)';
 
 $string['reviews_table'] = 'Таблица отзывов (вер. 2)';
 $string['scos_reviews_table'] = 'Таблица отзывов c СЦОС (вер. 2)';
@@ -22,3 +22,7 @@ $string['userid'] = 'ИД-пользователя';
 $string['firstname'] = 'Имя';
 $string['lastname'] = 'Фамилия';
 $string['isvisible'] = 'Показывать?';
+
+// Форма ввода idnumber
+$string['idnumberfieldlabel'] = 'ИД модуля "Обратная связь"';
+$string['idnumbersubmitbutton'] = 'Показать';

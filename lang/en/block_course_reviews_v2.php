@@ -4,7 +4,7 @@ $string['pluginname'] = 'Course Reviews (v. 2)';
 $string['course_reviews_v2:addinstance'] = 'Add a new Course Reviews block (v. 2)';
 
 $string['course_reviews_v2'] = 'Course Reviews (v. 2)';
-$string['scos_course_reviews'] = 'SCOS Course Reviews (v. 2)';
+$string['scos_course_reviews_v2'] = 'SCOS Course Reviews (v. 2)';
 
 $string['reviews_table'] = 'Reviews Table (v. 2)';
 $string['scos_reviews_table'] = 'SCOS Reviews Table (v. 2)';
@@ -22,3 +22,7 @@ $string['userid'] = 'User ID';
 $string['firstname'] = 'First Name';
 $string['lastname'] = 'Last Name';
 $string['isvisible'] = 'Is Visible';
+
+// Форма ввода idnumber
+$string['idnumberfieldlabel'] = 'Module feedback ID';
+$string['idnumbersubmitbutton'] = 'Show';

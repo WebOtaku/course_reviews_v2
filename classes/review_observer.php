@@ -2,7 +2,7 @@
 
 namespace block_course_reviews_v2;
 
-class review_observers {
+class review_observer {
     /**
      * Иницирует запросы на обновление записей в таблице feedback_completed
      * @param \core\event\base $event экземпляр события review_updated

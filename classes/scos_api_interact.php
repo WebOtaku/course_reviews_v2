@@ -21,7 +21,7 @@ class scos_api_interact {
     public static function get_course_feedback($fbid) {
         $fbusers = db_request::get_user_reviews_users_by_courseid($fbid, false);
         $raw_fbvalues = db_request::get_user_reviews_values_by_courseid($fbid, false);
-        $fbvalues = utilities::prepare_fbvalues($raw_fbvalues);
+        $fbvalues = utility::prepare_fbvalues($raw_fbvalues);
         $course_feedback = [];
 
         $i = 0;
