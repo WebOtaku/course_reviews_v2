@@ -43,5 +43,23 @@ class html_form_view
 
         return $html_str;
     }
+
+    public static function get_html_form_insert_scos_reviews($submit_url, $courseid, $idnumber, $page) {
+        global $PAGE;
+
+        $url_params = array('sesskey' => sesskey(), 'courseid' => $courseid, 'idnumber' => $idnumber);
+
+        if ($page) $url_params['page'] = $page;
+
+        $html_str = '
+            <form id="insertreviewsform" method="post" action="' . $submit_url . '">
+                <input type="submit" class="btn btn-secondary mr-1" id="insertreviewsbutton" name="insertreviewsbutton" 
+     value="'.get_string('insertreviewsbutton', 'block_course_reviews_v2').'"/>
+                '.html_writer::input_hidden_params(new moodle_url($PAGE->url, $url_params)).'
+            </form>
+        ';
+
+        return $html_str;
+    }
 }
 ?>

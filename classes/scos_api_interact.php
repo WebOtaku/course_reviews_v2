@@ -19,6 +19,7 @@ class scos_api_interact {
      * @param int $fbid - id модуля "Обратная связь" (feedback) в таблице feedback.
      * @return array массив объектов, согласно структуре возвращаемого результата.
      * */
+    /*TODO: удалить на рабочем сервере*/
     public static function get_course_feedback($fbid) {
         $fbusers = db_request::get_user_reviews_users_by_courseid($fbid, false);
         $raw_fbvalues = db_request::get_user_reviews_values_by_courseid($fbid, false);
@@ -52,6 +53,7 @@ class scos_api_interact {
      * @param int $courseid - id курса
      * @return array массив объектов, согласно структуре возвращаемого результата.
      * */
+    /*TODO: раскомментировать на рабочем сервере*/
     /*public static function get_course_feedback($courseid) {
         $course_feedback = block_scos_get_feedback($courseid);
         return $course_feedback;

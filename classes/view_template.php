@@ -18,7 +18,7 @@ class view_template {
         $PAGE->navbar->add($page_title, $page_url);
         echo $OUTPUT->header();
 
-        $url = new moodle_url($page_url, array('is_scos' => !$is_scos, 'idnumber' => $idnumber));
+        $url = new moodle_url($page_url, array('is_scos' => (!$is_scos)? 1 : 0, 'idnumber' => $idnumber));
 
         if (!$is_scos)
             $html_link = html_writer::link($url, get_string('scos_course_reviews_v2', 'block_course_reviews_v2'));
@@ -37,15 +37,10 @@ class view_template {
     }
 
     /**
-     * Выводить сообщение. Использовать если нужно вывести сообщение заместого
-     * иного содержимого текущей страницы (напр: сообщение об ошибке).
-     * @param string $page_title - заголовок страницы.
-     * @param string $page_url - url страницы.
+     * Выводить сообщение.
      * @param string $message - выводимое сообщение.
      * */
-    public static function print_message($page_title, $page_url, $message = '', $is_scos = 0, $idnumber = 0) {
-        self::print_page_header($page_title, $page_url, $is_scos, $idnumber);
+    public static function print_message($message = '') {
         echo '<h2>'.$message.'</h2>';
-        self::print_page_footer();
     }
 }

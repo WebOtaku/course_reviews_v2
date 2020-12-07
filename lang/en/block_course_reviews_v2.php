@@ -23,6 +23,9 @@ $string['firstname'] = 'First Name';
 $string['lastname'] = 'Last Name';
 $string['isvisible'] = 'Is Visible';
 
+$string['itemdeletebutton'] = 'Delete entry';
+$string['insertreviewsbutton'] = 'Insert SCOS reviews';
+
 // Форма ввода idnumber
 $string['idnumberfieldlabel'] = 'Module feedback ID';
 $string['idnumbersubmitbutton'] = 'Show';

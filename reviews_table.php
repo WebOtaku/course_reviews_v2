@@ -7,6 +7,8 @@ class reviews_table extends table_sql
     protected $fbvalues;
     protected $courseid;
     protected $idnumber;
+    protected $page;
+    protected $cmid;
     public $columns = array('fbcid');
     public $headers = array();
     public $optional_columns;
@@ -18,7 +20,7 @@ class reviews_table extends table_sql
      * в качестве ключа при сохранении свойств таблицы, таких как порядок сортировки, в сеансе.
      * @return void
      */
-    public function __construct($uniqueid, $raw_fbvalues = [], $courseid = 0, $idnumber = 0, $optional_columns = [], $optional_headers = [])
+    public function __construct($uniqueid, $raw_fbvalues = [], $courseid = 0, $idnumber = 0, $page = -1, $cmid = 0, $optional_columns = [], $optional_headers = [])
     {
         parent::__construct($uniqueid);
         $this->fbvalues = utility::prepare_fbvalues($raw_fbvalues);
@@ -38,6 +40,8 @@ class reviews_table extends table_sql
 
         $this->courseid = $courseid;
         $this->idnumber = $idnumber;
+        $this->page = $page;
+        $this->cmid = $cmid;
     }
 
     /**
@@ -57,6 +61,7 @@ class reviews_table extends table_sql
         }
 
         $this->columns[] = 'isvisible';
+        $this->columns[] = 'delete';
     }
 
     /**
@@ -71,6 +76,7 @@ class reviews_table extends table_sql
         foreach ($this->fbvalues[array_keys($this->fbvalues)[0]] as $fbname => $fbvalue)
             $this->headers[] = $fbname;
         $this->headers[] = get_string('isvisible', 'block_course_reviews_v2');
+        $this->headers[] = '';
     }
 
     /**
@@ -155,6 +161,23 @@ class reviews_table extends table_sql
         }
     }
 
+    public function col_delete($values) {
+        $params = array(
+            'id' => $this->cmid,
+            'delete' => $values->fbcid,
+            'sesskey' => sesskey()
+        );
+        $url = new moodle_url('../../mod/feedback/show_entries.php', $params);
+
+        return '
+            <a href="'.$url.'" id="itemdeletebutton'. $values->fbcid .'" class="itemdeletebutton action-icon">
+                <i class="icon fa fa-trash fa-fw " 
+                title="'.get_string('itemdeletebutton', 'block_course_reviews_v2').'" 
+                aria-label="'.get_string('itemdeletebutton', 'block_course_reviews_v2').'"></i>
+            </a>
+        ';
+    }
+
     /**
      * Добавляет html перед таблицей. В данном случае это форма.
      * @return void
@@ -167,11 +190,14 @@ class reviews_table extends table_sql
         }
 
         $submit_url = new moodle_url('/blocks/course_reviews_v2/table_view.php');
+        $url_params = array('sesskey' => sesskey(), 'courseid' => $this->courseid, 'idnumber' => $this->idnumber);
+
+        if ($this->page > 0)
+            $url_params['page'] = $this->page;
 
         echo '<div id="tablecontainer">';
         echo '<form id="attemptsform" method="post" action="' . $submit_url . '">';
-        echo html_writer::input_hidden_params(new moodle_url($PAGE->url,
-            array('sesskey' => sesskey(), 'courseid' => $this->courseid, 'idnumber' => $this->idnumber)));
+        echo html_writer::input_hidden_params(new moodle_url($PAGE->url, $url_params));
         echo '<div>';
     }
 
@@ -198,6 +224,8 @@ class reviews_table extends table_sql
         echo '<a id="checkattempts" href="#">' . get_string('selectall', 'quiz') . '</a> / ';
         echo '<a id="uncheckattempts" href="#">' . get_string('selectnone', 'quiz') . '</a> ';
 
+        $url = new moodle_url('/blocks/course_reviews_v2/table_view.php');
+
         $PAGE->requires->js_amd_inline("
             require(['jquery'], function($) {
                 $('#checkattempts').click(function(e) {
@@ -207,6 +235,41 @@ class reviews_table extends table_sql
                 $('#uncheckattempts').click(function(e) {
                     $('#attemptsform').find('input:checkbox').prop('checked', false);
                     e.preventDefault();
+                });
+                $('.itemdeletebutton').click(function(e) {
+                    e.preventDefault();
+                    var targetHref = e.target.parentNode.href;
+                    
+                    $.post(targetHref, function() {
+                        var numElems = $('.itemdeletebutton').length;
+                        var parsedParams = location.search.replace('?','').split('&')
+                            .reduce(
+                                function(p,e){
+                                    var a = e.split('=');
+                                    p[decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
+                                    return p;
+                                },
+                                {}
+                            );
+    
+                        var page = parsedParams['page'];
+                        
+                        var urlParams = {
+                            'courseid': parsedParams['courseid'],
+                            'is_scos': parsedParams['is_scos'],
+                            'idnumber': parsedParams['idnumber'],
+                        }
+                    
+                        if (page > 0 && numElems === 1) {
+                            page--;
+                        }   
+                        
+                        if (page > 0) urlParams.page = page;
+                        
+                        var pageUrl = '". $url ."' + '?' + $.param(urlParams);
+                        
+                        location.href = pageUrl;
+                    })
                 });
             });"
         );
@@ -228,9 +291,9 @@ class reviews_table extends table_sql
     {
         global $PAGE;
 
-        echo '<input type="submit" class="btn btn-secondary mr-1" id="updatereviewbutton" name="update" 
+        echo '<input type="submit" class="btn btn-secondary mr-1" id="updatereviewsbutton" name="updatereviewsbutton" 
                      value="'.get_string('savebtn', 'block_course_reviews_v2').'"/>';
-        $PAGE->requires->event_handler('#updatereviewbutton', 'click', 'M.util.show_confirm_dialog',
+        $PAGE->requires->event_handler('#updatereviewsbutton', 'click', 'M.util.show_confirm_dialog',
             array('message' => get_string('acceptsavemessage', 'block_course_reviews_v2')));
     }
 }

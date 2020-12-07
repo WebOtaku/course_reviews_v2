@@ -17,7 +17,8 @@ require_once "reviews_table.php";
 $courseid = required_param('courseid', PARAM_INT);
 $is_scos = optional_param('is_scos', 0, PARAM_BOOL);
 $download = optional_param('download', '', PARAM_ALPHA);
-$idnumber = (string) optional_param('idnumber', '', PARAM_INT);
+$idnumber = (string) optional_param('idnumber', 0, PARAM_INT);
+$page = optional_param('page', '', PARAM_INT);
 
 $idnumber = (utility::str_is_int($idnumber,
     array(constant::$IDNUMBER_RANGE[0], constant::$IDNUMBER_RANGE[1])))? $idnumber : 0;
@@ -59,7 +60,7 @@ if (has_capability('block/course_reviews_v2:addinstance', $context)) {
             if(utility::check_fb_validity($fb)) {
 
                 // Обработка нажатия кнопки "Сохранить" (Save)
-                if (count($_POST)) {
+                if (isset($_POST['updatereviewsbutton'])) {
                     $params = array(
                         'context' => $context,
                         'other' => array(
@@ -70,29 +71,29 @@ if (has_capability('block/course_reviews_v2:addinstance', $context)) {
                     $event = review_updated::create($params);
                     $event->trigger();
 
-                    redirect(new moodle_url($page_url, array('idnumber' => $idnumber)));
+                    $url_params = array('idnumber' => $idnumber);
+                    if ($page) $url_params['page'] = $page;
+
+                    redirect(new moodle_url($page_url, $url_params));
                 }
 
-                $raw_scos_course_reviews = scos_api_interact::get_course_feedback($fb->fbid);
-                db_request::insert_scos_course_reviews($raw_scos_course_reviews, $fb->fbid);
+                // Обработка нажатия кнопки "Вставить отзывы с СЦОС" (Insert SCOS reviews)
+                if (isset($_POST['insertreviewsbutton']) && $is_scos) {
+                    $raw_scos_course_reviews = scos_api_interact::get_course_feedback($fb->fbid);
+                    db_request::insert_scos_course_reviews($raw_scos_course_reviews, $fb->fbid);
+
+                    $url_params = array('idnumber' => $idnumber);
+                    if ($page) $url_params['page'] = $page;
+
+                    redirect(new moodle_url($page_url, $url_params));
+                }
 
                 if ($is_scos) {
                     $fbvalues = db_request::get_user_reviews_values_by_courseid($fb->fbid, true);
                 } else $fbvalues = db_request::get_user_reviews_values_by_courseid($fb->fbid, false);
 
-                /*if ($is_scos) {
-                    $raw_scos_course_reviews = scos_api_interact::get_course_feedback($fb->fbid);
-                    db_request::insert_scos_course_reviews($raw_scos_course_reviews, $fb->fbid);
-
-                    $fbvalues = db_request::get_user_reviews_values_by_courseid($fb->fbid, true);
-                } else $fbvalues = db_request::get_user_reviews_values_by_courseid($fb->fbid, false);*/
-
                 // Проверка на наличие выводимых значений
                 if (count($fbvalues)) {
-                    /*print_object(db_request::get_scos_course_reviews(
-                        $fb->fbid, false,
-                        array('offset' => 0, 'limit' => 8),
-                        array('field' => 'timemodified', 'order' => 'DESC')));*/
                     
                     if ($is_scos) {
                         $optional_columns = array('timemodified');
@@ -109,7 +110,7 @@ if (has_capability('block/course_reviews_v2:addinstance', $context)) {
                         );
                     }
 
-                    $table = new reviews_table('uniqueid', $fbvalues, $courseid, $idnumber, $optional_columns, $optional_headers);
+                    $table = new reviews_table('uniqueid', $fbvalues, $courseid, $idnumber, $page, $fb->cmid, $optional_columns, $optional_headers);
 
                     $table->is_downloading($download, $page_title, $page_title);
 
@@ -117,6 +118,9 @@ if (has_capability('block/course_reviews_v2:addinstance', $context)) {
                         // Отображать только в случае если не было запроса на скачивание таблицы
                         view_template::print_page_header($page_title, $page_url, $is_scos, $idnumber);
                         echo html_form_view::get_html_form_feedback_table_params($page_url, $courseid, $idnumber);
+
+                        if ($is_scos)
+                            echo html_form_view::get_html_form_insert_scos_reviews($page_url, $courseid, $idnumber, $page);
                     }
 
                     if ($is_scos) {
@@ -146,19 +150,27 @@ if (has_capability('block/course_reviews_v2:addinstance', $context)) {
                     $params = array('fbid' => $fb->fbid);
 
                     $table->set_sql($fields, $from, $where, $params);
-                    $table->define_baseurl($page_url);
+                    $table->define_baseurl(new moodle_url($page_url, array('idnumber' => $idnumber)));
 
-                    $table->out(8, true);
+                    $table->out(8,  true);
 
                     if (!$table->is_downloading()) {
                         view_template::print_page_footer();
                     }
-                } else view_template::print_message($page_title, $page_url,
-                    get_string('emptytablemessage', 'block_course_reviews_v2'), $is_scos, $idnumber);
+                } else {
+                    view_template::print_page_header($page_title, $page_url, $is_scos, $idnumber);
+                    echo html_form_view::get_html_form_feedback_table_params($page_url, $courseid, $idnumber);
+                    if ($is_scos) echo html_form_view::get_html_form_insert_scos_reviews($page_url, $courseid, $idnumber, $page);
+                    view_template::print_message(get_string('emptytablemessage', 'block_course_reviews_v2'));
+                    view_template::print_page_footer();
+                }
 
             } else redirect(new moodle_url($page_url, array('idnumber' => 0)));
 
         } else redirect(new moodle_url($page_url, array('idnumber' => 0)));
     }
-} else view_template::print_message($page_title, $page_url,
-    get_string('nopermissionmessage', 'block_course_reviews_v2'), $is_scos, $idnumber);
+} else {
+    view_template::print_page_header($page_title, $page_url, $is_scos, $idnumber);
+    view_template::print_message(get_string('nopermissionmessage', 'block_course_reviews_v2'));
+    view_template::print_page_footer();
+}

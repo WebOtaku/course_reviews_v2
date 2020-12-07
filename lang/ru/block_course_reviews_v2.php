@@ -23,6 +23,9 @@ $string['firstname'] = 'Имя';
 $string['lastname'] = 'Фамилия';
 $string['isvisible'] = 'Показывать?';
 
+$string['itemdeletebutton'] = 'Удалить запись';
+$string['insertreviewsbutton'] = 'Вставить отзывы с СЦОС';
+
 // Форма ввода idnumber
 $string['idnumberfieldlabel'] = 'ИД модуля "Обратная связь"';
 $string['idnumbersubmitbutton'] = 'Показать';

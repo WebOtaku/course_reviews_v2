@@ -4,10 +4,14 @@ namespace block_course_reviews_v2;
 
 class constant {
     // Требуемы типы полей
+    /*TODO: удалить на рабочем сервере*/
     public static $VALID_FIELDS_TYPES = array('numeric', 'textarea');
+    /*TODO: раскомментировать на рабочем сервере*/
     //public static $VALID_FIELDS_TYPES = array('multichoicerated', 'textarea');
     // Тип поля для ввода оценки
+    /*TODO: удалить на рабочем сервере*/
     public static $RATING_FIELD_TYPE = 'numeric';
+    /*TODO: раскомментировать на рабочем сервере*/
     //public static $RATING_FIELD_TYPE = 'multichoicerated';
     // Тип поля для ввода комментария к оценке
     public static $TEXT_FIELD_TYPE = 'textarea';

@@ -16,7 +16,7 @@ class db_request {
         global $DB;
 
         $sql_request = '
-            SELECT fb.id AS fbid
+            SELECT cm.id AS cmid, fb.id AS fbid
             FROM {course_modules} AS cm
             JOIN {feedback} AS fb ON fb.id = cm.instance
             WHERE cm.deletioninprogress = 0 AND cm.course = :courseid AND cm.idnumber = :idnumber AND cm.module = :moduleid
@@ -423,7 +423,7 @@ class db_request {
     }
 
     /**
-     * Запрашивает из таблициы feedback_completed отзывы с СЦОС по текущему курсу.
+     * Запрашивает из таблициы feedback_completed отзывы по текущему курсу.
      * Если не передавать id модуля "Обратная связь" (feedback), то вернёт все отзывы.
      * Структура возвращаемого результата:
      *     array(
@@ -440,18 +440,18 @@ class db_request {
      * @param string[] $orderby - массив параметров для сортировки при запросе (ORDER BY field order).
      * @return array массив объектов записей, согласно структуре возвращаемого результата.
      * */
-    public static function get_scos_course_reviews(
-        $fbid, $isvisible = -1,
+    public static function get_course_reviews(
+        $fbid, $is_scos = -1, $isvisible = -1,
         $pagination = array('offset' => 0, 'limit' => 0),
         $orderby = array('field' => '', 'order' => 'DESC')
     ) {
-        $fbcs = db_request::get_user_reviews_users_by_courseid($fbid, true, $isvisible, $pagination, $orderby);
+        $fbcs = db_request::get_user_reviews_users_by_courseid($fbid, $is_scos, $isvisible, $pagination, $orderby);
 
         $fbvalues = array();
         $raw_fbvalues = array();
 
         if (count($fbcs)) {
-            $raw_fbvalues = db_request::get_user_reviews_values_by_fbcids(array_keys($fbcs), true);
+            $raw_fbvalues = db_request::get_user_reviews_values_by_fbcids(array_keys($fbcs), $is_scos);
             $fbvalues = utility::prepare_fbvalues($raw_fbvalues);
         }
 
@@ -462,7 +462,11 @@ class db_request {
         $i = 0;
         foreach ($fbcs as $fbc) {
             $course_feedback[$i] = new \stdClass();
-            $course_feedback[$i]->user = '';
+
+            if ($fbc->userid == 1)
+                $course_feedback[$i]->user = '';
+            else
+                $course_feedback[$i]->user = $fbc->lastname . ' ' . $fbc->firstname;
 
             if ($fbiname = array_search(constant::$RATING_FIELD_TYPE, $fbvalues_types))
                 $course_feedback[$i]->rating = $fbvalues[$fbc->fbcid][array_search(constant::$RATING_FIELD_TYPE, $fbvalues_types)];
@@ -478,14 +482,15 @@ class db_request {
     }
 
     /**
-     * Запрашивает из таблициы feedback_completed отзывы с СЦОС по текущему курсу.
+     * Запрашивает из таблициы feedback_completed отзывы для указанного
+     * экземепляра модуля feedback и подсчитывает их.
      * Если не передавать id модуля "Обратная связь" (feedback), то вернёт все отзывы.
      * @param int $fbid - id модуля "Обратная связь" (feedback) в таблице feedback.
-     * @param int $is_scos - возвращать только содержимое отзывов с СЦОС.
+     * @param int $is_scos - учитывать отзывы с СЦОС.
      * @return int кол-во отзывов на данный курс в зависимости от параметра $is_scos.
      * */
-    public static function get_num_scos_course_reviews($fbid, $is_scos = -1) {
+    /*public static function get_num_course_reviews($fbid, $is_scos = -1) {
         return count(self::get_user_reviews_users_by_courseid($fbid, $is_scos));
-    }
+    }*/
 }
 ?>
